@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twilight Certification Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2e8ab8 0%, #236a8e 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .progress-container {
+            background: #e8ebf5;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: #e0e5f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-right: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2e8ab8 0%, #236a8e 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            color: #2e8ab8;
+            font-weight: 600;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .start-screen {
+            text-align: center;
+        }
+
+        .start-screen h2 {
+            color: #2d3748;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .start-screen p {
+            color: #718096;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .question-container {
+            display: none;
+        }
+
+        .question-container.active {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .question {
+            font-size: 1.3rem;
+            color: #2d3748;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .question-number {
+            color: #2e8ab8;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: #2e8ab8;
+            box-shadow: 0 0 0 3px rgba(46, 138, 184, 0.1);
+        }
+
+        .button-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2e8ab8 0%, #236a8e 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(46, 138, 184, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #2e8ab8;
+            border: 2px solid #2e8ab8;
+        }
+
+        .btn-secondary:hover {
+            background: #f7fafc;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .results-screen {
+            display: none;
+            text-align: center;
+        }
+
+        .results-screen.active {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        .results-screen h2 {
+            color: #2d3748;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .score-display {
+            font-size: 4rem;
+            color: #2e8ab8;
+            font-weight: 700;
+            margin: 30px 0;
+        }
+
+        .success-message {
+            color: #155724;
+            background: #d4edda;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .answers-review {
+            text-align: left;
+            margin-top: 40px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+
+        .answer-item {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .answer-item:last-child {
+            border-bottom: none;
+        }
+
+        .answer-question {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .answer-text {
+            color: #4a5568;
+            line-height: 1.5;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+        }
+
+        @media (max-width: 640px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .header p {
+                font-size: 0.95rem;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .question {
+                font-size: 1.1rem;
+            }
+
+            .button-container {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .score-display {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Twilight Certification Quiz</h1>
+            <p>Test your knowledge and earn your certification</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0 / 10</div>
+        </div>
+
+        <div class="content">
+            <div class="start-screen" id="startScreen">
+                <h2>Welcome to the Certification Quiz</h2>
+                <p>This quiz consists of 10 questions about the Twilight dark adaptation test system. Please answer each question to the best of your ability. You can navigate between questions using the Next and Previous buttons.</p>
+                <div style="margin: 30px 0;">
+                    <input type="text" class="answer-input" id="clientName" placeholder="Enter your name or client name" style="min-height: 50px;">
+                </div>
+                <button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
+            </div>
+
+            <div class="question-container" id="questionContainer">
+                <div class="question">
+                    <span class="question-number" id="questionNumber">Question 1 of 10</span>
+                    <span id="questionText"></span>
+                </div>
+                <textarea class="answer-input" id="answerInput" placeholder="Type your answer here..."></textarea>
+                <div class="button-container">
+                    <button class="btn btn-secondary" id="prevBtn" onclick="prevQuestion()">Previous</button>
+                    <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">Next</button>
+                </div>
+            </div>
+
+            <div class="results-screen" id="resultsScreen">
+                <h2>Quiz Completed!</h2>
+                <div class="success-message" id="successMessage" style="display: none;">
+                    ✓ Your quiz has been submitted successfully!
+                </div>
+                <div class="score-display">10/10</div>
+                <p style="color: #718096; font-size: 1.1rem; margin-bottom: 20px;">All questions answered</p>
+                <div class="answers-review" id="answersReview"></div>
+                <div class="button-container">
+                    <button class="btn btn-secondary" onclick="window.location.href='/dashboard'">Go to Dashboard</button>
+                    <button class="btn btn-primary" onclick="restartQuiz()">Retake Quiz</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            "What CPT code is used for dark adaptation test reimbursement in patients meeting medical necessity criteria?",
+            "What are three patient groups who should routinely receive Twilight testing?",
+            "How long does a Twilight rapid dark adaptation test typically take?",
+            "Where is the optimal placement for Twilight in clinic workflow?",
+            "What age threshold triggers routine testing?",
+            "What is the reimbursement pathway for CPT 92284 for tests conducted in patients with medical necessity?",
+            "Which common diagnostics are usually performed after a Twilight-positive finding to identify reasons for delayed dark adaptation?",
+            "How do you confirm headset and earphone functionality?",
+            "What are the obligations of a 'Twilight Champion'?",
+            "How long is an operator's certification valid before renewal?"
+        ];
+
+        let currentQuestion = 0;
+        let answers = new Array(questions.length).fill('');
+        let clientName = '';
+
+        function startQuiz() {
+            clientName = document.getElementById('clientName').value.trim();
+            
+            if (clientName === '') {
+                alert('Please enter your name before starting the quiz.');
+                return;
+            }
+            
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('questionContainer').classList.add('active');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            document.getElementById('questionNumber').textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+            document.getElementById('questionText').textContent = questions[currentQuestion];
+            document.getElementById('answerInput').value = answers[currentQuestion];
+            
+            document.getElementById('prevBtn').disabled = currentQuestion === 0;
+            document.getElementById('nextBtn').textContent = currentQuestion === questions.length - 1 ? 'Finish' : 'Next';
+            
+            updateProgress();
+        }
+
+        function saveAnswer() {
+            answers[currentQuestion] = document.getElementById('answerInput').value;
+        }
+
+        function nextQuestion() {
+            saveAnswer();
+            
+            const currentAnswer = document.getElementById('answerInput').value.trim();
+            
+            if (currentAnswer === '') {
+                alert('Please provide an answer before continuing.');
+                return;
+            }
+            
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function prevQuestion() {
+            saveAnswer();
+            
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion();
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `${currentQuestion + 1} / ${questions.length}`;
+        }
+
+        function showResults() {
+            document.getElementById('questionContainer').classList.remove('active');
+            
+            const answeredCount = answers.filter(a => a.trim() !== '').length;
+            
+            // Submit to backend
+            submitQuizToBackend(answeredCount).then(() => {
+                document.getElementById('resultsScreen').classList.add('active');
+                document.getElementById('successMessage').style.display = 'block';
+                document.querySelector('.score-display').textContent = `${answeredCount}/${questions.length}`;
+                
+                const reviewHTML = questions.map((q, i) => `
+                    <div class="answer-item">
+                        <div class="answer-question">Question ${i + 1}: ${q}</div>
+                        <div class="answer-text">${answers[i] || '<em style="color: #a0aec0;">No answer provided</em>'}</div>
+                    </div>
+                `).join('');
+                
+                document.getElementById('answersReview').innerHTML = reviewHTML;
+            }).catch(err => {
+                console.error('Submission error:', err);
+                alert('Error submitting quiz. Please try again or contact support.');
+                currentQuestion = questions.length - 1;
+                document.getElementById('questionContainer').classList.add('active');
+            });
+        }
+
+        async function submitQuizToBackend(score) {
+            console.log('Submitting quiz with data:', {
+                clientName,
+                answers,
+                score
+            });
+
+            try {
+                const response = await fetch('/submit-quiz', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        clientName: clientName,
+                        answers: answers,
+                        score: score
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to submit quiz');
+                }
+
+                const data = await response.json();
+                console.log('Quiz submitted successfully:', data);
+                return data;
+            } catch (error) {
+                console.error('Error submitting quiz:', error);
+                throw error;
+            }
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            answers = new Array(questions.length).fill('');
+            clientName = '';
+            document.getElementById('resultsScreen').classList.remove('active');
+            document.getElementById('startScreen').style.display = 'block';
+            document.getElementById('clientName').value = '';
+            document.getElementById('successMessage').style.display = 'none';
+            updateProgress();
+        }
+    </script>
+</body>
+</html>

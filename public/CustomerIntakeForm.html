@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer Intake Information Form</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #e0f2ff 0%, #f8fafc 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    .form-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 900px;
+      border-radius: 18px;
+      padding: 3rem 3.5rem;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.8s ease;
+      position: relative;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      text-align: center;
+      color: #2d6886;
+      margin-bottom: 2rem;
+      font-weight: 600;
+      font-size: 1.9rem;
+      letter-spacing: 0.5px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem 2rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-weight: 500;
+      color: #2e8ab8;
+      margin-bottom: 0.4rem;
+      font-size: 0.95rem;
+    }
+
+    input, select, textarea {
+      padding: 0.8rem 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 1rem;
+      background-color: #f9fafb;
+      transition: all 0.25s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #2e8ab8;
+      background-color: #ffffff;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      outline: none;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .form-group input[type="file"] {
+      padding: 0.4rem;
+      background: #f8fafc;
+    }
+
+    #otherPatientInfo {
+      height: 160px;
+      width: 100%;
+    }
+
+    #otherPatientField {
+      display: none;
+      grid-column: span 2;
+    }
+
+    button {
+      grid-column: span 2;
+      background: linear-gradient(90deg, #2d6886, #2e8ab8);
+      color: white;
+      padding: 0.9rem;
+      font-size: 1.05rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+    }
+
+    button:hover {
+      background: linear-gradient(90deg, #2d6886, #2e8ab8);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+    }
+
+    a.logo-link {
+      display: block;
+      position: relative;
+      width: fit-content;
+      margin: 0 auto 1.5rem auto;
+    }
+
+    .form-logo {
+      height: 80px;
+      object-fit: contain;
+      transition: transform 0.2s ease;
+    }
+
+    .form-logo:hover {
+      transform: scale(1.05);
+    }
+
+    a.logo-link::after {
+      content: "Go to Evoq";
+      position: absolute;
+      bottom: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #2d6886;
+      color: white;
+      font-size: 0.8rem;
+      padding: 3px 7px;
+      border-radius: 6px;
+      opacity: 0;
+      white-space: nowrap;
+      pointer-events: none;
+      transition: opacity 0.3s ease, bottom 0.3s ease;
+    }
+
+    a.logo-link:hover::after {
+      opacity: 1;
+      bottom: -18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <a href="https://goevoq.com/" target="_blank" rel="noopener noreferrer" class="logo-link">
+      <img src="evoq.png" alt="Company Logo" class="form-logo">
+    </a>
+
+    <h2>Customer Intake Information Form</h2>
+    <form class="form-grid" id="intakeForm" action="/submit" method="POST" enctype="multipart/form-data">
+      <div class="form-group">
+        <label>Account Name</label>
+        <input type="text" name="accountName" required />
+      </div>
+
+      <div class="form-group">
+        <label>Primary Email</label>
+        <input type="email" name="primaryEmail" required />
+      </div>
+
+      <div class="form-group">
+        <label>Backup Email</label>
+        <input type="email" name="backupEmail" required />
+      </div>
+
+      <div class="form-group">
+        <label>Location Address</label>
+        <input type="text" name="locationAddress" required />
+      </div>
+
+      <div class="form-group">
+        <label>Key Contact</label>
+        <input type="text" name="keyContact" required />
+      </div>
+
+      <div class="form-group">
+        <label>Billing Information</label>
+        <input type="text" name="billingInfo" required />
+      </div>
+
+      <div class="form-group">
+        <label>Intended Patient Population</label>
+        <select id="patientPopulation" name="patientPopulation" required>
+          <option value="">Select...</option>
+          <option value="over50">Over 50</option>
+          <option value="diabetic">Diabetic</option>
+          <option value="glaucoma">Glaucoma</option>
+          <option value="amd">AMD</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div id="otherPatientField" class="form-group">
+        <textarea id="otherPatientInfo" name="otherPatientInfo" placeholder="Please describe..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Practice Logo (optional)</label>
+        <input type="file" name="practiceLogo" accept="image/*" />
+      </div>
+
+      <div class="form-group">
+        <label>WiFi Settings</label>
+        <input type="text" name="wifiSettings" required />
+      </div>
+
+      <div class="form-group" style="grid-column: span 2;">
+        <label>What EHR or systems does the practice use?</label>
+        <input type="text" name="ehrSystems" required />
+      </div>
+
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <script>
+    const patientSelect = document.getElementById('patientPopulation');
+    const otherField = document.getElementById('otherPatientField');
+
+    patientSelect.addEventListener('change', () => {
+      if (patientSelect.value === 'other') {
+        otherField.style.display = 'block';
+        otherField.querySelector('textarea').required = true;
+      } else {
+        otherField.style.display = 'none';
+        otherField.querySelector('textarea').required = false;
+      }
+    });
+  </script>
+</body>
+</html>

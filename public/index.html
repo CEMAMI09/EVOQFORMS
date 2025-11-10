@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evoq Dashboard</title>
+ <link rel="stylesheet" href="/dashboard.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <!-- Hover wrapper for sidebar + button -->
+    <div class="sidebar-wrapper">
+      <!-- Hamburger -->
+      <button class="hamburger" id="hamburger">&#9776;</button>
+
+      <!-- Sidebar -->
+      <nav class="sidebar" id="sidebar">
+        <div class="logo">
+          <img src="evoq.png" alt="Evoq Logo" class="sidebar-logo" />
+        </div>
+        <ul>
+          <li data-page="home" class="active">Home</li>
+          <li data-page="intake">Intake Forms</li>
+          <li data-page="quiz">Quiz Submissions</li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Main content -->
+    <main class="main-content">
+      <div id="home" class="page active">
+        <div class="welcome-text">
+          <img src="evoq.png" alt="Evoq Logo" class="home-logo" />
+          <h1>Welcome to The Dashboard</h1>
+          <p>Use the sidebar to navigate to the Invoke Forms or Quiz Submissions page.</p>
+        </div>
+      </div>
+
+      <div id="intake" class="page">
+        <h1>Customer Intake Forms</h1>
+        <div class="table-wrapper">
+          <table id="intakeTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Account Name</th>
+                <th>Primary Email</th>
+                <th>Backup Email</th>
+                <th>Address</th>
+                <th>Key Contact</th>
+                <th>Billing Info</th>
+                <th>Patient Population</th>
+                <th>Other Info</th>
+                <th>WiFi</th>
+                <th>EHR</th>
+                <th>Logo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Data injected here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="quiz" class="page">
+        <h1>Quiz Submissions</h1>
+        
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h3>Total Submissions</h3>
+            <div class="stat-value" id="totalSubmissions">0</div>
+          </div>
+          <div class="stat-card">
+            <h3>Average Score</h3>
+            <div class="stat-value" id="avgScore">0/10</div>
+          </div>
+          <div class="stat-card">
+            <h3>Today's Submissions</h3>
+            <div class="stat-value" id="todaySubmissions">0</div>
+          </div>
+        </div>
+
+        <!-- Search Box -->
+        <div class="search-container">
+          <input type="text" class="search-box" id="searchBox" placeholder="Search by client name...">
+        </div>
+
+        <!-- Quiz Table -->
+        <div class="table-wrapper">
+          <table id="quizTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Client Name</th>
+                <th>Score</th>
+                <th>Submitted</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Data injected here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal for viewing quiz details -->
+  <div class="modal" id="detailModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Quiz Details</h2>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <div id="modalBody">
+        <!-- Details will be loaded here -->
+      </div>
+    </div>
+  </div>
+
+ <script src="/dashboard.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evoq Dashboard</title>
+ <link rel="stylesheet" href="/dashboard.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <!-- Hover wrapper for sidebar + button -->
+    <div class="sidebar-wrapper">
+      <!-- Hamburger -->
+      <button class="hamburger" id="hamburger">&#9776;</button>
+
+      <!-- Sidebar -->
+      <nav class="sidebar" id="sidebar">
+        <div class="logo">
+          <img src="evoq.png" alt="Evoq Logo" class="sidebar-logo" />
+        </div>
+        <ul>
+          <li data-page="home" class="active">Home</li>
+          <li data-page="intake">Invoke Forms</li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Main content -->
+    <main class="main-content">
+      <div id="home" class="page active">
+        <div class="welcome-text">
+          <img src="evoq.png" alt="Evoq Logo" class="home-logo" />
+          <h1>Welcome to The Dashboard</h1>
+          <p>Use the sidebar to navigate to the Invoke Forms page.</p>
+        </div>
+      </div>
+
+      <div id="intake" class="page">
+        <h1>Customer Intake Forms</h1>
+        <div class="table-wrapper">
+          <table id="intakeTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Account Name</th>
+                <th>Primary Email</th>
+                <th>Backup Email</th>
+                <th>Address</th>
+                <th>Key Contact</th>
+                <th>Billing Info</th>
+                <th>Patient Population</th>
+                <th>Other Info</th>
+                <th>WiFi</th>
+                <th>EHR</th>
+                <th>Logo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Data injected here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+ <script src="/dashboard.js" defer></script>
+</body>
+</html>
