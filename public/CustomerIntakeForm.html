@@ -44,6 +44,17 @@
       letter-spacing: 0.5px;
     }
 
+    .section-title {
+      grid-column: span 2;
+      color: #2e8ab8;
+      font-weight: 600;
+      font-size: 1.2rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -53,6 +64,10 @@
     .form-group {
       display: flex;
       flex-direction: column;
+    }
+
+    .form-group.full-width {
+      grid-column: span 2;
     }
 
     label {
@@ -69,6 +84,7 @@
       font-size: 1rem;
       background-color: #f9fafb;
       transition: all 0.25s ease;
+      font-family: "Poppins", sans-serif;
     }
 
     input:focus, select:focus, textarea:focus {
@@ -108,6 +124,7 @@
       cursor: pointer;
       transition: all 0.3s ease;
       margin-top: 1rem;
+      font-weight: 600;
     }
 
     button:hover {
@@ -154,6 +171,18 @@
       opacity: 1;
       bottom: -18px;
     }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section-title,
+      .form-group.full-width,
+      button {
+        grid-column: span 1;
+      }
+    }
   </style>
 </head>
 <body>
@@ -164,6 +193,10 @@
 
     <h2>Customer Intake Information Form</h2>
     <form class="form-grid" id="intakeForm" action="/submit" method="POST" enctype="multipart/form-data">
+      
+      <!-- Basic Information -->
+      <div class="section-title">Basic Information</div>
+
       <div class="form-group">
         <label>Account Name</label>
         <input type="text" name="accountName" required />
@@ -190,9 +223,45 @@
       </div>
 
       <div class="form-group">
-        <label>Billing Information</label>
-        <input type="text" name="billingInfo" required />
+        <label>Practice Logo (optional)</label>
+        <input type="file" name="practiceLogo" accept="image/*" />
       </div>
+
+      <!-- Billing Information -->
+      <div class="section-title">Billing Information</div>
+
+      <div class="form-group full-width">
+        <label>Billing Address</label>
+        <input type="text" name="billingAddress" required />
+      </div>
+
+      <div class="form-group">
+        <label>Name on Card</label>
+        <input type="text" name="cardName" required />
+      </div>
+
+      <div class="form-group">
+        <label>Card Number</label>
+        <input type="text" name="cardNumber" id="cardNumberInput" maxlength="19" placeholder="1234 5678 9012 3456" required />
+      </div>
+
+      <div class="form-group">
+        <label>Expiration Date</label>
+        <input type="text" name="cardExpiry" id="cardExpiryInput" placeholder="MM/YY" maxlength="5" required />
+      </div>
+
+      <div class="form-group">
+        <label>CVV</label>
+        <input type="text" name="cardCVV" id="cardCVVInput" maxlength="4" placeholder="123" required />
+      </div>
+
+      <div class="form-group">
+        <label>Billing Zip Code</label>
+        <input type="text" name="billingZipCode" id="billingZipInput" maxlength="5" placeholder="12345" required />
+      </div>
+
+      <!-- Patient Population -->
+      <div class="section-title">Patient Information</div>
 
       <div class="form-group">
         <label>Intended Patient Population</label>
@@ -210,17 +279,44 @@
         <textarea id="otherPatientInfo" name="otherPatientInfo" placeholder="Please describe..."></textarea>
       </div>
 
+      <!-- WiFi Settings -->
+      <div class="section-title">WiFi Settings</div>
+
       <div class="form-group">
-        <label>Practice Logo (optional)</label>
-        <input type="file" name="practiceLogo" accept="image/*" />
+        <label>WiFi Network Name (SSID)</label>
+        <input type="text" name="wifiSSID" required />
       </div>
 
       <div class="form-group">
-        <label>WiFi Settings</label>
-        <input type="text" name="wifiSettings" required />
+        <label>WiFi Password</label>
+        <input type="password" name="wifiPassword" required />
       </div>
 
-      <div class="form-group" style="grid-column: span 2;">
+      <div class="form-group">
+        <label>Security Type</label>
+        <select name="wifiSecurity" required>
+          <option value="">Select...</option>
+          <option value="WPA3">WPA3</option>
+          <option value="WPA2">WPA2</option>
+          <option value="WEP">WEP</option>
+          <option value="None">None (Open Network)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>WiFi Frequency</label>
+        <select name="wifiFrequency" required>
+          <option value="">Select...</option>
+          <option value="2.4GHz">2.4 GHz</option>
+          <option value="5GHz">5 GHz</option>
+          <option value="Both">Both (Dual Band)</option>
+        </select>
+      </div>
+
+      <!-- EHR Systems -->
+      <div class="section-title">Systems Information</div>
+
+      <div class="form-group full-width">
         <label>What EHR or systems does the practice use?</label>
         <input type="text" name="ehrSystems" required />
       </div>
@@ -240,6 +336,71 @@
       } else {
         otherField.style.display = 'none';
         otherField.querySelector('textarea').required = false;
+      }
+    });
+
+    // Format card number with spaces
+    const cardNumberInput = document.getElementById('cardNumberInput');
+    cardNumberInput.addEventListener('input', (e) => {
+      let value = e.target.value.replace(/\s/g, '').replace(/\D/g, '');
+      let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+      e.target.value = formattedValue;
+    });
+
+    // Format expiration date
+    const expiryInput = document.getElementById('cardExpiryInput');
+    expiryInput.addEventListener('input', (e) => {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length >= 2) {
+        value = value.substring(0, 2) + '/' + value.substring(2, 4);
+      }
+      e.target.value = value;
+    });
+
+    // Only allow numbers in CVV
+    const cvvInput = document.getElementById('cardCVVInput');
+    cvvInput.addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/\D/g, '');
+    });
+
+    // Only allow numbers in Zip
+    const zipInput = document.getElementById('billingZipInput');
+    zipInput.addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/\D/g, '');
+    });
+
+    // Validate card number on form submit (must be 13-19 digits without spaces)
+    document.getElementById('intakeForm').addEventListener('submit', (e) => {
+      const cardNumber = cardNumberInput.value.replace(/\s/g, '');
+      if (cardNumber.length < 13 || cardNumber.length > 19) {
+        e.preventDefault();
+        alert('Please enter a valid card number (13-19 digits)');
+        cardNumberInput.focus();
+        return false;
+      }
+
+      const cvv = cvvInput.value;
+      if (cvv.length < 3 || cvv.length > 4) {
+        e.preventDefault();
+        alert('Please enter a valid CVV (3-4 digits)');
+        cvvInput.focus();
+        return false;
+      }
+
+      const zip = zipInput.value;
+      if (zip.length !== 5) {
+        e.preventDefault();
+        alert('Please enter a valid 5-digit zip code');
+        zipInput.focus();
+        return false;
+      }
+
+      const expiry = expiryInput.value;
+      if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) {
+        e.preventDefault();
+        alert('Please enter a valid expiration date (MM/YY)');
+        expiryInput.focus();
+        return false;
       }
     });
   </script>

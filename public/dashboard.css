@@ -59,6 +59,34 @@ body {
   background: #2e8ab8;
   color: white;
 }
+.sidebar .logout-container {
+  padding: 20px;
+  margin-top: auto;
+}
+
+.sidebar .logout-btn {
+  display: block;
+  text-align: center;
+  padding: 12px;
+  background: rgba(255, 59, 48, 0.9);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.sidebar .logout-btn:hover {
+  background: rgba(255, 59, 48, 1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(255, 59, 48, 0.3);
+}
+
+.sidebar .logout-btn .logout-icon {
+  margin-right: 8px;
+  font-size: 1.1rem;
+}
 
 /* Hamburger button */
 .hamburger {
@@ -250,6 +278,29 @@ img.logo {
   color: #721c24;
 }
 
+/* Pass/Fail Badge */
+.pass-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: #d4edda;
+  color: #155724;
+  border: 2px solid #155724;
+}
+
+.fail-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: #f8d7da;
+  color: #721c24;
+  border: 2px solid #721c24;
+}
+
 /* View Button */
 .view-btn {
   padding: 0.5rem 1rem;
@@ -400,6 +451,30 @@ img.logo {
 .answer-text {
   color: #4a5568;
   line-height: 1.6;
+}
+
+.sensitive-data {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background: #f0f4f8;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.sensitive-data:hover {
+  background: #e2e8f0;
+}
+
+.toggle-icon {
+  font-size: 1.1rem;
+  opacity: 0.6;
+}
+
+.sensitive-data:hover .toggle-icon {
+  opacity: 1;
 }
 
 /* FadeIn animation */

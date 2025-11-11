@@ -133,6 +133,40 @@
             margin-bottom: 10px;
         }
 
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .choice {
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+        }
+
+        .choice:hover {
+            border-color: #2e8ab8;
+            background: #f7fafc;
+        }
+
+        .choice.selected {
+            border-color: #2e8ab8;
+            background: #e6f2f8;
+        }
+
+        .choice input[type="radio"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
         .answer-input {
             width: 100%;
             padding: 15px 20px;
@@ -219,6 +253,18 @@
             margin: 30px 0;
         }
 
+        .score-display.perfect {
+            color: #10b981;
+        }
+
+        .score-display.good {
+            color: #2e8ab8;
+        }
+
+        .score-display.needs-improvement {
+            color: #f59e0b;
+        }
+
         .success-message {
             color: #155724;
             background: #d4edda;
@@ -260,6 +306,20 @@
             background: white;
             padding: 10px 15px;
             border-radius: 5px;
+        }
+
+        .answer-text.correct {
+            border-left: 4px solid #10b981;
+        }
+
+        .answer-text.incorrect {
+            border-left: 4px solid #ef4444;
+        }
+
+        .correct-answer {
+            color: #10b981;
+            font-weight: 600;
+            margin-top: 5px;
         }
 
         @media (max-width: 640px) {
@@ -310,7 +370,7 @@
         <div class="content">
             <div class="start-screen" id="startScreen">
                 <h2>Welcome to the Certification Quiz</h2>
-                <p>This quiz consists of 10 questions about the Twilight dark adaptation test system. Please answer each question to the best of your ability. You can navigate between questions using the Next and Previous buttons.</p>
+                <p>This quiz consists of 10 multiple choice questions about the Twilight dark adaptation test system. Select the best answer for each question.</p>
                 <div style="margin: 30px 0;">
                     <input type="text" class="answer-input" id="clientName" placeholder="Enter your name or client name" style="min-height: 50px;">
                 </div>
@@ -322,7 +382,9 @@
                     <span class="question-number" id="questionNumber">Question 1 of 10</span>
                     <span id="questionText"></span>
                 </div>
-                <textarea class="answer-input" id="answerInput" placeholder="Type your answer here..."></textarea>
+                <div class="choices" id="choicesContainer">
+                    <!-- Choices will be inserted here -->
+                </div>
                 <div class="button-container">
                     <button class="btn btn-secondary" id="prevBtn" onclick="prevQuestion()">Previous</button>
                     <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">Next</button>
@@ -334,8 +396,8 @@
                 <div class="success-message" id="successMessage" style="display: none;">
                     ✓ Your quiz has been submitted successfully!
                 </div>
-                <div class="score-display">10/10</div>
-                <p style="color: #718096; font-size: 1.1rem; margin-bottom: 20px;">All questions answered</p>
+                <div class="score-display" id="scoreDisplay">10/10</div>
+                <p style="color: #718096; font-size: 1.1rem; margin-bottom: 20px;" id="scoreMessage">Perfect score!</p>
                 <div class="answers-review" id="answersReview"></div>
                 <div class="button-container">
                     <button class="btn btn-secondary" onclick="window.location.href='/dashboard'">Go to Dashboard</button>
@@ -346,21 +408,62 @@
     </div>
 
     <script>
-        const questions = [
-            "What CPT code is used for dark adaptation test reimbursement in patients meeting medical necessity criteria?",
-            "What are three patient groups who should routinely receive Twilight testing?",
-            "How long does a Twilight rapid dark adaptation test typically take?",
-            "Where is the optimal placement for Twilight in clinic workflow?",
-            "What age threshold triggers routine testing?",
-            "What is the reimbursement pathway for CPT 92284 for tests conducted in patients with medical necessity?",
-            "Which common diagnostics are usually performed after a Twilight-positive finding to identify reasons for delayed dark adaptation?",
-            "How do you confirm headset and earphone functionality?",
-            "What are the obligations of a 'Twilight Champion'?",
-            "How long is an operator's certification valid before renewal?"
+        // Quiz data with questions and answers
+        const quizData = [
+            {
+                question: "What CPT code is used for dark adaptation test reimbursement in patients meeting medical necessity criteria?",
+                choices: ["Example Answer 1", "Example Answer 2", "Example Answer 3"],
+                correct: 0 // Index of correct answer (0 = first choice)
+            },
+            {
+                question: "What are three patient groups who should routinely receive Twilight testing?",
+                choices: ["Example Answer 1", "Example Answer 2", "Example Answer 3"],
+                correct: 1
+            },
+            {
+                question: "How long does a Twilight rapid dark adaptation test typically take?",
+                choices: ["Example Answer 1", "Example Answer 2", "Example Answer 3"],
+                correct: 2
+            },
+            {
+                question: "Where is the optimal placement for Twilight in clinic workflow?",
+                choices: ["Example Answer 1", "Example Answer 2", "Example Answer 3"],
+                correct: 0
+            },
+            {
+                question: "What age threshold triggers routine testing?",
+                choices: ["Example Answer 1", "Example Answer 2", "Example Answer 3"],
+                correct: 1
+            },
+            {
+                question: "What is the reimbursement pathway for CPT 92284 for tests conducted in patients with medical necessity?",
+                choices: ["Example Answer 1", "Example Answer 2", "Example Answer 3"],
+                correct: 2
+            },
+            {
+                question: "Which common diagnostics are usually performed after a Twilight-positive finding to identify reasons for delayed dark adaptation?",
+                choices: ["Example Answer 1", "Example Answer 2", "Example Answer 3"],
+                correct: 0
+            },
+            {
+                question: "How do you confirm headset and earphone functionality?",
+                choices: ["Example Answer 1", "Example Answer 2", "Example Answer 3"],
+                correct: 1
+            },
+            {
+                question: "What are the obligations of a 'Twilight Champion'?",
+                choices: ["Example Answer 1", "Example Answer 2", "Example Answer 3"],
+                correct: 2
+            },
+            {
+                question: "How long is an operator's certification valid before renewal?",
+                choices: ["Example Answer 1", "Example Answer 2", "Example Answer 3"],
+                correct: 0
+            }
         ];
 
         let currentQuestion = 0;
-        let answers = new Array(questions.length).fill('');
+        let answers = new Array(quizData.length).fill(-1); // -1 means not answered
         let clientName = '';
 
         function startQuiz() {
@@ -377,31 +480,48 @@
         }
 
         function loadQuestion() {
-            document.getElementById('questionNumber').textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
-            document.getElementById('questionText').textContent = questions[currentQuestion];
-            document.getElementById('answerInput').value = answers[currentQuestion];
+            const data = quizData[currentQuestion];
+            
+            document.getElementById('questionNumber').textContent = `Question ${currentQuestion + 1} of ${quizData.length}`;
+            document.getElementById('questionText').textContent = data.question;
+            
+            // Build choices
+            const choicesContainer = document.getElementById('choicesContainer');
+            choicesContainer.innerHTML = data.choices.map((choice, index) => `
+                <label class="choice ${answers[currentQuestion] === index ? 'selected' : ''}" onclick="selectChoice(${index})">
+                    <input type="radio" name="answer" value="${index}" ${answers[currentQuestion] === index ? 'checked' : ''}>
+                    <span>${choice}</span>
+                </label>
+            `).join('');
             
             document.getElementById('prevBtn').disabled = currentQuestion === 0;
-            document.getElementById('nextBtn').textContent = currentQuestion === questions.length - 1 ? 'Finish' : 'Next';
+            document.getElementById('nextBtn').textContent = currentQuestion === quizData.length - 1 ? 'Finish' : 'Next';
             
             updateProgress();
         }
 
-        function saveAnswer() {
-            answers[currentQuestion] = document.getElementById('answerInput').value;
+        function selectChoice(index) {
+            answers[currentQuestion] = index;
+            
+            // Update UI
+            document.querySelectorAll('.choice').forEach((choice, i) => {
+                if (i === index) {
+                    choice.classList.add('selected');
+                    choice.querySelector('input').checked = true;
+                } else {
+                    choice.classList.remove('selected');
+                    choice.querySelector('input').checked = false;
+                }
+            });
         }
 
         function nextQuestion() {
-            saveAnswer();
-            
-            const currentAnswer = document.getElementById('answerInput').value.trim();
-            
-            if (currentAnswer === '') {
-                alert('Please provide an answer before continuing.');
+            if (answers[currentQuestion] === -1) {
+                alert('Please select an answer before continuing.');
                 return;
             }
             
-            if (currentQuestion < questions.length - 1) {
+            if (currentQuestion < quizData.length - 1) {
                 currentQuestion++;
                 loadQuestion();
             } else {
@@ -410,8 +530,6 @@
         }
 
         function prevQuestion() {
-            saveAnswer();
-            
             if (currentQuestion > 0) {
                 currentQuestion--;
                 loadQuestion();
@@ -419,42 +537,77 @@
         }
 
         function updateProgress() {
-            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            const progress = ((currentQuestion + 1) / quizData.length) * 100;
             document.getElementById('progressFill').style.width = progress + '%';
-            document.getElementById('progressText').textContent = `${currentQuestion + 1} / ${questions.length}`;
+            document.getElementById('progressText').textContent = `${currentQuestion + 1} / ${quizData.length}`;
+        }
+
+        function calculateScore() {
+            let correctCount = 0;
+            answers.forEach((answer, index) => {
+                if (answer === quizData[index].correct) {
+                    correctCount++;
+                }
+            });
+            return correctCount;
         }
 
         function showResults() {
             document.getElementById('questionContainer').classList.remove('active');
             
-            const answeredCount = answers.filter(a => a.trim() !== '').length;
+            const score = calculateScore();
+            const percentage = (score / quizData.length) * 100;
             
             // Submit to backend
-            submitQuizToBackend(answeredCount).then(() => {
+            submitQuizToBackend(score).then(() => {
                 document.getElementById('resultsScreen').classList.add('active');
                 document.getElementById('successMessage').style.display = 'block';
-                document.querySelector('.score-display').textContent = `${answeredCount}/${questions.length}`;
                 
-                const reviewHTML = questions.map((q, i) => `
-                    <div class="answer-item">
-                        <div class="answer-question">Question ${i + 1}: ${q}</div>
-                        <div class="answer-text">${answers[i] || '<em style="color: #a0aec0;">No answer provided</em>'}</div>
-                    </div>
-                `).join('');
+                const scoreDisplay = document.getElementById('scoreDisplay');
+                scoreDisplay.textContent = `${score}/${quizData.length}`;
+                
+                // Color code based on score
+                if (percentage === 100) {
+                    scoreDisplay.className = 'score-display perfect';
+                    document.getElementById('scoreMessage').textContent = 'Perfect score! 🎉';
+                } else if (percentage >= 70) {
+                    scoreDisplay.className = 'score-display good';
+                    document.getElementById('scoreMessage').textContent = 'Great job!';
+                } else {
+                    scoreDisplay.className = 'score-display needs-improvement';
+                    document.getElementById('scoreMessage').textContent = 'Keep studying and try again!';
+                }
+                
+                // Show review
+                const reviewHTML = quizData.map((q, i) => {
+                    const isCorrect = answers[i] === q.correct;
+                    return `
+                        <div class="answer-item">
+                            <div class="answer-question">Question ${i + 1}: ${q.question}</div>
+                            <div class="answer-text ${isCorrect ? 'correct' : 'incorrect'}">
+                                Your answer: ${q.choices[answers[i]]}
+                                ${!isCorrect ? `<div class="correct-answer">✓ Correct answer: ${q.choices[q.correct]}</div>` : ' ✓'}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
                 
                 document.getElementById('answersReview').innerHTML = reviewHTML;
             }).catch(err => {
                 console.error('Submission error:', err);
                 alert('Error submitting quiz. Please try again or contact support.');
-                currentQuestion = questions.length - 1;
-                document.getElementById('questionContainer').classList.add('active');
             });
         }
 
         async function submitQuizToBackend(score) {
+            // Convert answers to text for storage
+            const answerTexts = answers.map((answerIndex, questionIndex) => {
+                return quizData[questionIndex].choices[answerIndex];
+            });
+
             console.log('Submitting quiz with data:', {
                 clientName,
-                answers,
+                answers: answerTexts,
                 score
             });
 
@@ -466,7 +619,7 @@
                     },
                     body: JSON.stringify({
                         clientName: clientName,
-                        answers: answers,
+                        answers: answerTexts,
                         score: score
                     })
                 });
@@ -487,7 +640,7 @@
 
         function restartQuiz() {
             currentQuestion = 0;
-            answers = new Array(questions.length).fill('');
+            answers = new Array(quizData.length).fill(-1);
             clientName = '';
             document.getElementById('resultsScreen').classList.remove('active');
             document.getElementById('startScreen').style.display = 'block';

@@ -3,6 +3,7 @@ const express = require("express");
 const path = require("path");
 const sqlite3 = require("sqlite3").verbose();
 const multer = require("multer");
+const session = require("express-session");
 const app = express();
 const PORT = 3000;
 
@@ -11,8 +12,32 @@ const publicPath = path.join(__dirname, "public");
 console.log("📂 Serving static files from:", publicPath);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static(publicPath));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// Session setup (MUST come before routes)
+app.use(session({
+  secret: '$unsetwayevoql25-session-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { 
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    httpOnly: true
+  }
+}));
+
+// Authentication credentials
+const ADMIN_USERNAME = 'evoqtech';
+const ADMIN_PASSWORD = '$unsetwayevoql25';
+
+// Middleware to check if user is authenticated
+function requireAuth(req, res, next) {
+  console.log("🔒 requireAuth checking:", req.path, "Session:", req.session?.authenticated);
+  if (req.session && req.session.authenticated) {
+    return next();
+  } else {
+    console.log("❌ Not authenticated, redirecting to /login");
+    res.redirect('/login');
+  }
+}
 
 // ================= MULTER SETUP =================
 const storage = multer.diskStorage({
@@ -41,10 +66,18 @@ CREATE TABLE IF NOT EXISTS intake_form (
   backupEmail TEXT,
   locationAddress TEXT,
   keyContact TEXT,
-  billingInfo TEXT,
+  billingAddress TEXT,
+  cardName TEXT,
+  cardNumber TEXT,
+  cardExpiry TEXT,
+  cardCVV TEXT,
+  billingZipCode TEXT,
   patientPopulation TEXT,
   otherPatientInfo TEXT,
-  wifiSettings TEXT,
+  wifiSSID TEXT,
+  wifiPassword TEXT,
+  wifiSecurity TEXT,
+  wifiFrequency TEXT,
   ehrSystems TEXT,
   practiceLogoPath TEXT
 )
@@ -78,21 +111,65 @@ CREATE TABLE IF NOT EXISTS certification_quiz (
 
 // ================= ROUTES =================
 
-// Home → Customer Intake Form
-app.get("/", (req, res) => {
-  console.log("➡️ GET / hit - sending CustomerIntakeForm.html");
+// Root - Redirect to login (protected route)
+app.get("/", requireAuth, (req, res) => {
+  console.log("➡️ GET / hit - redirecting to /dashboard");
+  res.redirect('/dashboard');
+});
+
+// Login page
+app.get("/login", (req, res) => {
+  // If already logged in, redirect to dashboard
+  if (req.session && req.session.authenticated) {
+    console.log("➡️ Already authenticated, redirecting to /dashboard");
+    return res.redirect('/dashboard');
+  }
+  console.log("➡️ GET /login hit - sending login.html");
+  res.sendFile(path.join(publicPath, "login.html"));
+});
+
+// Login handler
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
+  
+  console.log("🔐 Login attempt");
+  console.log("Received username:", username);
+  console.log("Expected username:", ADMIN_USERNAME);
+  console.log("Passwords match:", password === ADMIN_PASSWORD);
+  
+  if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+    req.session.authenticated = true;
+    req.session.username = username;
+    console.log("✅ Login successful");
+    res.json({ success: true });
+  } else {
+    console.log("❌ Login failed");
+    res.status(401).json({ success: false, message: "Invalid credentials" });
+  }
+});
+
+// Logout handler
+app.get("/logout", (req, res) => {
+  console.log("🚪 Logging out user");
+  req.session.destroy();
+  res.redirect('/login');
+});
+
+// Dashboard (protected)
+app.get("/dashboard", requireAuth, (req, res) => {
+  console.log("➡️ GET /dashboard hit - sending dashboard.html");
+  res.sendFile(path.join(publicPath, "dashboard.html"));
+});
+
+// Intake Form (public - for customers to fill out)
+app.get("/intakeform.html", (req, res) => {
+  console.log("➡️ GET /intakeform.html hit - sending CustomerIntakeForm.html");
   res.sendFile(path.join(publicPath, "CustomerIntakeForm.html"));
 });
 
-// Dashboard page (this is the main dashboard with sidebar)
-app.get("/dashboard", (req, res) => {
-  console.log("➡️ GET /dashboard hit - sending index.html");
-  res.sendFile(path.join(publicPath, "index.html"));
-});
-
-// Quiz page (the certification quiz form)
-app.get("/quiz", (req, res) => {
-  console.log("➡️ GET /quiz hit - sending quiz.html");
+// Quiz page (public - for customers to take quiz)
+app.get("/quiz.html", (req, res) => {
+  console.log("➡️ GET /quiz.html hit - sending quiz.html");
   res.sendFile(path.join(publicPath, "quiz.html"));
 });
 
@@ -105,20 +182,27 @@ app.get("/completed", (req, res) => {
 app.post("/submit", upload.single("practiceLogo"), (req, res) => {
   const {
     accountName, primaryEmail, backupEmail, locationAddress, keyContact,
-    billingInfo, patientPopulation, otherPatientInfo, wifiSettings, ehrSystems
+    billingAddress, cardName, cardNumber, cardExpiry, cardCVV, billingZipCode,
+    patientPopulation, otherPatientInfo, 
+    wifiSSID, wifiPassword, wifiSecurity, wifiFrequency,
+    ehrSystems
   } = req.body;
   const logoPath = req.file ? req.file.path : null;
   
   db.run(
     `INSERT INTO intake_form (
       accountName, primaryEmail, backupEmail, locationAddress, keyContact,
-      billingInfo, patientPopulation, otherPatientInfo, wifiSettings, ehrSystems,
-      practiceLogoPath
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      billingAddress, cardName, cardNumber, cardExpiry, cardCVV, billingZipCode,
+      patientPopulation, otherPatientInfo, 
+      wifiSSID, wifiPassword, wifiSecurity, wifiFrequency,
+      ehrSystems, practiceLogoPath
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       accountName, primaryEmail, backupEmail, locationAddress, keyContact,
-      billingInfo, patientPopulation, otherPatientInfo, wifiSettings, ehrSystems,
-      logoPath
+      billingAddress, cardName, cardNumber, cardExpiry, cardCVV, billingZipCode,
+      patientPopulation, otherPatientInfo || '',
+      wifiSSID, wifiPassword, wifiSecurity, wifiFrequency,
+      ehrSystems, logoPath
     ],
     (err) => {
       if (err) {
@@ -182,8 +266,8 @@ app.post("/submit-quiz", (req, res) => {
   );
 });
 
-// API: Get all intake forms
-app.get("/api/intake-forms", (req, res) => {
+// API: Get all intake forms (protected)
+app.get("/api/intake-forms", requireAuth, (req, res) => {
   console.log("➡️ GET /api/intake-forms hit");
   db.all("SELECT * FROM intake_form ORDER BY id DESC", [], (err, rows) => {
     if (err) {
@@ -195,8 +279,8 @@ app.get("/api/intake-forms", (req, res) => {
   });
 });
 
-// API: Get all quiz submissions
-app.get("/api/quiz-submissions", (req, res) => {
+// API: Get all quiz submissions (protected)
+app.get("/api/quiz-submissions", requireAuth, (req, res) => {
   console.log("➡️ GET /api/quiz-submissions hit");
   db.all(
     "SELECT * FROM certification_quiz ORDER BY submittedAt DESC", 
@@ -212,8 +296,8 @@ app.get("/api/quiz-submissions", (req, res) => {
   );
 });
 
-// API: Get specific quiz submission by ID
-app.get("/api/quiz-submissions/:id", (req, res) => {
+// API: Get specific quiz submission by ID (protected)
+app.get("/api/quiz-submissions/:id", requireAuth, (req, res) => {
   console.log(`➡️ GET /api/quiz-submissions/${req.params.id} hit`);
   db.get(
     "SELECT * FROM certification_quiz WHERE id = ?",
@@ -232,9 +316,28 @@ app.get("/api/quiz-submissions/:id", (req, res) => {
   );
 });
 
+// ================= SERVE STATIC FILES (MUST BE LAST) =================
+// Custom middleware to serve static files but block index/dashboard.html at root
+app.use((req, res, next) => {
+  console.log("📄 Static file request:", req.path);
+  
+  // Block dashboard.html and index.html from being served directly
+  if (req.path === '/dashboard.html' || req.path === '/index.html') {
+    console.log("🚫 Blocked direct access to:", req.path);
+    return res.status(404).send('Not Found');
+  }
+  
+  next();
+});
+
+// Now serve static files
+app.use(express.static(publicPath));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 // ================= START SERVER =================
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
   console.log(`📊 Dashboard at http://localhost:${PORT}/dashboard`);
-  console.log(`📝 Quiz at http://localhost:${PORT}/quiz`);
+  console.log(`📝 Quiz at http://localhost:${PORT}/quiz.html`);
+  console.log(`🔐 Login at http://localhost:${PORT}/login`);
 });
